@@ -139,6 +139,9 @@ function addQuote() {
 
     // Save the updated array to local storage
     saveQuotes();
+    
+    // Post the new quote to the server
+    postQuoteToServer(newQuote);
 
     // Update the categories in the filter dropdown
     populateCategories();
@@ -213,52 +216,94 @@ function importFromJsonFile(event) {
 }
 
 /**
- * @function syncWithServer
- * @description Simulates fetching data from a server and syncing it with local quotes.
- * This function also includes a simple conflict resolution strategy.
+ * @function postQuoteToServer
+ * @description Simulates posting a new quote to a server.
+ * @param {object} quote The quote object to post.
  */
-async function syncWithServer() {
-  console.log("Syncing with server...");
+async function postQuoteToServer(quote) {
+  console.log("Posting new quote to server...");
   try {
-    // Simulate fetching data from a mock API
+    const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        title: quote.text,
+        body: quote.category,
+        userId: 1, // Mock user ID
+      }),
+    });
+    if (response.ok) {
+      console.log('Quote posted successfully to server.');
+    } else {
+      console.error('Failed to post quote to server:', response.statusText);
+    }
+  } catch (error) {
+    console.error('Network error while posting quote:', error);
+  }
+}
+
+/**
+ * @function fetchQuotesFromServer
+ * @description Fetches data from a simulated server.
+ * @returns {Promise<Array>} A promise that resolves with an array of quotes.
+ */
+async function fetchQuotesFromServer() {
+  try {
     const response = await fetch('https://jsonplaceholder.typicode.com/posts?_limit=5');
-    const serverQuotes = await response.json();
-    
-    // Convert mock API response to quote format
-    const newServerQuotes = serverQuotes.map(post => ({
+    const serverData = await response.json();
+    return serverData.map(post => ({
       text: post.title,
       category: "Server"
     }));
-
-    let hasConflicts = false;
-
-    // Simple conflict resolution: server data takes precedence.
-    // We will merge new quotes from the server that are not already in local storage.
-    newServerQuotes.forEach(serverQuote => {
-      // Check if a quote with the same text already exists
-      const exists = quotes.some(localQuote => localQuote.text === serverQuote.text);
-      if (!exists) {
-        quotes.push(serverQuote);
-        hasConflicts = true; // Flag for potential conflicts/updates
-      }
-    });
-
-    if (hasConflicts) {
-      alert("Updates synced from server. Conflicts were resolved by accepting server data.");
-    } else {
-      console.log("Local data is up-to-date with the server.");
-    }
-    
-    // Save the merged data to local storage
-    saveQuotes();
-    // Repopulate categories and display quotes with the updated data
-    populateCategories();
-    filterQuotes();
-
   } catch (error) {
-    console.error("Failed to sync with server:", error);
-    alert("Failed to sync with server. Please try again later.");
+    console.error("Failed to fetch quotes from server:", error);
+    return []; // Return an empty array on failure
   }
+}
+
+/**
+ * @function syncQuotes
+ * @description Syncs local quotes with server data, resolving conflicts.
+ */
+async function syncQuotes() {
+  console.log("Syncing quotes...");
+  const serverQuotes = await fetchQuotesFromServer();
+  
+  if (serverQuotes.length === 0) {
+    console.log("No new quotes to sync.");
+    return;
+  }
+  
+  let hasNewQuotes = false;
+  let hasConflicts = false;
+
+  // Simple conflict resolution: server data takes precedence.
+  serverQuotes.forEach(serverQuote => {
+    // Check if a quote with the same text already exists
+    const exists = quotes.some(localQuote => localQuote.text === serverQuote.text);
+    if (!exists) {
+      quotes.push(serverQuote);
+      hasNewQuotes = true;
+    } else {
+      hasConflicts = true; // A quote with the same text exists, but we are not overwriting
+    }
+  });
+
+  if (hasNewQuotes) {
+    alert("New quotes have been synced from the server.");
+  } else if (hasConflicts) {
+    alert("Local data is up-to-date. No new quotes were added from the server.");
+  } else {
+    alert("Local data is up-to-date with the server. No changes found.");
+  }
+
+  // Save the merged data to local storage
+  saveQuotes();
+  // Repopulate categories and display quotes with the updated data
+  populateCategories();
+  filterQuotes();
 }
 
 // Add event listener to the "Show New Quote" button
@@ -278,7 +323,7 @@ window.onload = function() {
   // Display a random quote based on the selected filter
   filterQuotes();
   // Sync with the server on page load
-  syncWithServer();
+  syncQuotes();
   // Periodically sync with the server every 5 minutes
-  setInterval(syncWithServer, 300000); 
+  setInterval(syncQuotes, 300000); 
 };

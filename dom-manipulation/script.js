@@ -212,6 +212,55 @@ function importFromJsonFile(event) {
   fileReader.readAsText(event.target.files[0]);
 }
 
+/**
+ * @function syncWithServer
+ * @description Simulates fetching data from a server and syncing it with local quotes.
+ * This function also includes a simple conflict resolution strategy.
+ */
+async function syncWithServer() {
+  console.log("Syncing with server...");
+  try {
+    // Simulate fetching data from a mock API
+    const response = await fetch('https://jsonplaceholder.typicode.com/posts?_limit=5');
+    const serverQuotes = await response.json();
+    
+    // Convert mock API response to quote format
+    const newServerQuotes = serverQuotes.map(post => ({
+      text: post.title,
+      category: "Server"
+    }));
+
+    let hasConflicts = false;
+
+    // Simple conflict resolution: server data takes precedence.
+    // We will merge new quotes from the server that are not already in local storage.
+    newServerQuotes.forEach(serverQuote => {
+      // Check if a quote with the same text already exists
+      const exists = quotes.some(localQuote => localQuote.text === serverQuote.text);
+      if (!exists) {
+        quotes.push(serverQuote);
+        hasConflicts = true; // Flag for potential conflicts/updates
+      }
+    });
+
+    if (hasConflicts) {
+      alert("Updates synced from server. Conflicts were resolved by accepting server data.");
+    } else {
+      console.log("Local data is up-to-date with the server.");
+    }
+    
+    // Save the merged data to local storage
+    saveQuotes();
+    // Repopulate categories and display quotes with the updated data
+    populateCategories();
+    filterQuotes();
+
+  } catch (error) {
+    console.error("Failed to sync with server:", error);
+    alert("Failed to sync with server. Please try again later.");
+  }
+}
+
 // Add event listener to the "Show New Quote" button
 newQuoteButton.addEventListener('click', showRandomQuote);
 
@@ -228,4 +277,8 @@ window.onload = function() {
   }
   // Display a random quote based on the selected filter
   filterQuotes();
+  // Sync with the server on page load
+  syncWithServer();
+  // Periodically sync with the server every 5 minutes
+  setInterval(syncWithServer, 300000); 
 };

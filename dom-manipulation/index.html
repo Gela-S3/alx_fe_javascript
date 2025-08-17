@@ -70,10 +70,10 @@
       box-sizing: border-box;
       border: 1px solid #cbd5e1;
     }
-    #addQuoteForm {
-      margin-top: 2rem;
-      padding-top: 1.5rem;
-      border-top: 1px dashed #e2e8f0;
+    .form-section {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px dashed #e2e8f0;
     }
   </style>
 </head>
@@ -88,9 +88,17 @@
     <button id="newQuote" class="bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
       Show New Quote
     </button>
-
-    <!-- Placeholder for the dynamic quote addition form -->
-    <div id="addQuoteForm" class="mt-8"></div>
+    
+    <!-- Quote addition and file handling section -->
+    <div class="form-section">
+      <h3>Add New Quote</h3>
+      <input id="newQuoteText" type="text" placeholder="Enter a new quote" />
+      <input id="newQuoteCategory" type="text" placeholder="Enter quote category" />
+      <button onclick="addQuote()">Add Quote</button>
+      <br>
+      <button onclick="exportToJsonFile()">Export Quotes</button>
+      <input type="file" id="importFile" accept=".json" onchange="importFromJsonFile(event)" />
+    </div>
   </div>
   <script src="script.js"></script>
 </body>

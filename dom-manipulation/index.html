@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic Quote Generator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f0f4f8;
+      color: #334155;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+    .container {
+      background-color: white;
+      padding: 2.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      width: 100%;
+      max-width: 600px;
+      text-align: center;
+    }
+    #quoteDisplay {
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1.5rem;
+    }
+    #quoteText {
+      font-size: 1.5rem;
+      font-style: italic;
+      color: #1e293b;
+      line-height: 1.6;
+    }
+    #quoteCategory {
+      margin-top: 0.5rem;
+      font-size: 1rem;
+      color: #475569;
+      font-weight: 500;
+    }
+    button, input {
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.2s;
+      margin-top: 1rem;
+      border: 1px solid #cbd5e1;
+    }
+    button {
+      background-color: #4c62e5;
+      color: white;
+      border: none;
+    }
+    button:hover {
+      background-color: #3f51b5;
+      transform: translateY(-2px);
+    }
+    input {
+      background-color: #f8fafc;
+      width: 100%;
+      margin-bottom: 0.5rem;
+      box-sizing: border-box;
+      border: 1px solid #cbd5e1;
+    }
+    #addQuoteForm {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px dashed #e2e8f0;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div class="container">
+    <h1 class="text-3xl font-bold text-center mb-4 text-slate-700">Dynamic Quote Generator</h1>
+    
+    <!-- Placeholder for dynamic quote display -->
+    <div id="quoteDisplay" class="my-6"></div>
+    
+    <!-- Button to show a new random quote -->
+    <button id="newQuote" class="bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+      Show New Quote
+    </button>
+
+    <!-- Placeholder for the dynamic quote addition form -->
+    <div id="addQuoteForm" class="mt-8"></div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
